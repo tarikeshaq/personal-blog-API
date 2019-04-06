@@ -3,10 +3,10 @@ package models
 import "gopkg.in/mgo.v2/bson"
 
 type Post struct {
-	ID    bson.ObjectId `bson:"_id" json:"id"`
-	Title string        `bson:"title" json:"title"`
-	Content
-	Date string `bson:"date" json:"date"`
+	ID      bson.ObjectId `bson:"_id" json:"id"`
+	Title   string        `bson:"title" json:"title"`
+	Content string
+	Date    string `bson:"date" json:"date"`
 }
 
 type Content struct {
