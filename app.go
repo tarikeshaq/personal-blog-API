@@ -1,56 +1,37 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
-
-	"gopkg.in/mgo.v2/bson"
-
-	dao "personal-blog-api/dao"
-
-	. "personal-blog-api/models"
 
 	"github.com/gorilla/mux"
 )
 
-func AllBlogsEndPoint(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprintln(writer, "SHOULD RETURN ALL BLOGS")
-
+func GetAllBlogsHandler(writer http.ResponseWriter, request *http.Request) {
+	writer.Write([]byte("Not yet Implemented, gets all posts"))
 }
 
-func GetPostEndPoint(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprintln(writer, "SHOULD RETURN A SPECIFIC POST")
+func GetOneBlogHandler(writer http.ResponseWriter, request *http.Request) {
+	vars := mux.Vars(request)
+	blogId := vars["blogId"]
+	writer.Write([]byte("Not yet implemented, gets one post with Id" + blogId))
 }
 
-func RemovePostEndPoint(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprintln(writer, "NOT IMPLEMENTED, REMOVE")
+func AddNewBlogHandler(writer http.ResponseWriter, request *http.Request) {
+	writer.Write([]byte("Not yet implemented, creates a new post using the payload from the request"))
 }
 
-func InsertPostEndPoint(writer http.ResponseWriter, request *http.Request) {
-	defer request.Body.Close()
-	var post Post
-
-	if err := json.NewDecoder(request.Body).Decode(&post); err != nil {
-		respondWithError(writer, http.StatusBadRequest, "Invalid Request Payload")
-		return
-	}
-
-	post.ID = bson.NewObjectId()
-	if err := dao.Insert(post); err != nil {
-		respondWithError(writer, http.StatusInternalServerError, err.Error())
-	}
-	respondWithJson(writer, http.StatusCreated, post)
+func RemoveBlogHandler(writer http.ResponseWriter, request *http.Request) {
+	vars := mux.Vars(request)
+	blogId := vars["blogId"]
+	writer.Write([]byte("Not yet implemented, removes a post with ID " + blogId))
 }
 
 func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/posts", AllBlogsEndPoint).Methods("GET")
-	r.HandleFunc("/posts/{id}", GetPostEndPoint).Methods("GET")
-	r.HandleFunc("/posts", InsertPostEndPoint).Methods("POST")
-	r.HandleFunc("/post", RemovePostEndPoint).Methods("DELETE")
-	if err := http.ListenAndServe(":3000", r); err != nil {
-		log.Fatal(err)
-	}
+	router := mux.NewRouter()
+
+	router.HandleFunc("/blogs", GetAllBlogsHandler).Methods("GET")
+	router.HandleFunc("/blogs/{blogId}", GetOneBlogHandler).Methods("GET")
+	router.HandleFunc("/blogs", AddNewBlogHandler).Methods("POST")
+	router.HandleFunc("/blogs/{blogId}", RemoveBlogHandler).Methods("DELETE")
+	http.ListenAndServe(":3000", router)
 }
