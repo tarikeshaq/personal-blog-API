@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -16,17 +16,29 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type key string
+
+const (
+	hostKey     = key("hostKey")
+	usernameKey = key("usernameKey")
+	passwordKey = key("passwordKey")
+	databaseKey = key("databaseKey")
+)
+
 var client *mongo.Client
+var database *mongo.Database
 
 type Post = models.Post
 
 func GetAllBlogsHandler(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("content-type", "application/json")
 	var posts []Post
-	database := client.Database("personal_api")
 	collection := database.Collection("posts")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+
+	// ctx, err:= context.WithTimeout(context.Background(), 10*time.Second)
 	cursor, err := collection.Find(ctx, bson.M{})
+
 	if err != nil {
 		response.WriteHeader(http.StatusInternalServerError)
 		response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
@@ -52,7 +64,7 @@ func GetOneBlogHandler(response http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
 	blogId, _ := primitive.ObjectIDFromHex(params["blogId"])
 	var post Post
-	collection := client.Database("personal_api").Collection("posts")
+	collection := database.Collection("posts")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	filter := bson.D{{"_id", blogId}}
 	err := collection.FindOne(ctx, filter).Decode(&post)
@@ -69,7 +81,6 @@ func AddNewBlogHandler(response http.ResponseWriter, request *http.Request) {
 
 	var post Post
 	_ = json.NewDecoder(request.Body).Decode(&post)
-	database := client.Database("personal_api")
 	collection := database.Collection("posts")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	result, err := collection.InsertOne(ctx, post)
@@ -86,7 +97,6 @@ func RemoveBlogHandler(response http.ResponseWriter, request *http.Request) {
 
 	vars := mux.Vars(request)
 	blogId, _ := primitive.ObjectIDFromHex(vars["blogId"])
-	database := client.Database("personal_api")
 	collection := database.Collection("posts")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	filter := bson.D{{"_id", blogId}}
@@ -101,12 +111,33 @@ func RemoveBlogHandler(response http.ResponseWriter, request *http.Request) {
 
 func main() {
 	// setup mongodb connection
-	client, _ = mongo.NewClient(options.Client().ApplyURI(os.Getenv("DATABASE")))
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	err := client.Connect(ctx)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	ctx = context.WithValue(ctx, hostKey, os.Getenv("MONGO_HOST"))
+	ctx = context.WithValue(ctx, usernameKey, os.Getenv("MONGO_USERNAME"))
+	ctx = context.WithValue(ctx, passwordKey, os.Getenv("MONGO_PASSWORD"))
+	ctx = context.WithValue(ctx, databaseKey, os.Getenv("MONGO_DATABASE"))
+
+	uri := fmt.Sprintf(`mongodb://%s:%s@%s/%s`,
+		ctx.Value(usernameKey).(string),
+		ctx.Value(passwordKey).(string),
+		ctx.Value(hostKey).(string),
+		ctx.Value(databaseKey).(string),
+	)
+
+	fmt.Println(uri)
+
+	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 	if err != nil {
-		log.Fatal(err)
+		fmt.Errorf(err.Error())
 	}
+	err = client.Connect(ctx)
+	if err != nil {
+		fmt.Errorf(err.Error())
+	}
+
+	database = client.Database("blogs")
+
 	router := mux.NewRouter()
 	router.HandleFunc("/blogs", GetAllBlogsHandler).Methods("GET")
 	router.HandleFunc("/blogs/{blogId}", GetOneBlogHandler).Methods("GET")
