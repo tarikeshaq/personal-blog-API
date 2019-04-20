@@ -37,3 +37,4 @@
   root-package = "github.com/tarikeshaq/personal-blog-api
   go-verson = "1.12.1"
   ensure = true
+  install = ["./..."]
