@@ -112,5 +112,5 @@ func main() {
 	router.HandleFunc("/blogs/{blogId}", GetOneBlogHandler).Methods("GET")
 	router.HandleFunc("/blogs", AddNewBlogHandler).Methods("POST")
 	router.HandleFunc("/blogs/{blogId}", RemoveBlogHandler).Methods("DELETE")
-	http.ListenAndServe(os.Getenv("PORT"), router)
+	http.ListenAndServe(":"+os.Getenv("PORT"), router)
 }
