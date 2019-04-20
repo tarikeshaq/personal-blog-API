@@ -32,3 +32,8 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[metadata.heroku]
+  root-package = "github.com/tarikeshaq/personal-blog-api
+  go-verson = "1.12.1"
+  ensure = true
