@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -111,5 +112,5 @@ func main() {
 	router.HandleFunc("/blogs/{blogId}", GetOneBlogHandler).Methods("GET")
 	router.HandleFunc("/blogs", AddNewBlogHandler).Methods("POST")
 	router.HandleFunc("/blogs/{blogId}", RemoveBlogHandler).Methods("DELETE")
-	http.ListenAndServe(":3000", router)
+	http.ListenAndServe(os.Getenv("PORT"), router)
 }
