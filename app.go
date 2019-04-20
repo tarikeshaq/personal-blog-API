@@ -101,7 +101,7 @@ func RemoveBlogHandler(response http.ResponseWriter, request *http.Request) {
 
 func main() {
 	// setup mongodb connection
-	client, _ = mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, _ = mongo.NewClient(options.Client().ApplyURI(os.Getenv("DATABASE")))
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	err := client.Connect(ctx)
 	if err != nil {
