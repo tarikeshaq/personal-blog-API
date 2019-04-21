@@ -70,7 +70,7 @@ func setupRoutes() *mux.Router {
 }
 
 func GetAllBlogsHandler(response http.ResponseWriter, request *http.Request) {
-	response.Header().Set("content-type", "application/json")
+	response.Header().Set("Content-Type", "application/json")
 	response.Header().Set("Access-Control-Allow-Origin", "*")
 	response.Header().Set("Access-Control-Allow-Methods", "GET")
 	response.Header().Set("Access-Control-Allow-Headers",
@@ -103,8 +103,7 @@ func GetAllBlogsHandler(response http.ResponseWriter, request *http.Request) {
 }
 
 func GetOneBlogHandler(response http.ResponseWriter, request *http.Request) {
-	response.Header().Set("content-type", "application/json")
-	response.Header().Set("content-type", "application/json")
+	response.Header().Set("Content-Type", "application/json")
 	response.Header().Set("Access-Control-Allow-Origin", "*")
 	response.Header().Set("Access-Control-Allow-Methods", "GET")
 	response.Header().Set("Access-Control-Allow-Headers",
