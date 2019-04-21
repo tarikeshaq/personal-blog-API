@@ -5,6 +5,8 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 type Post struct {
 	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	Title     string             `json:"title,omitempty" bson:"title,omitempty"`
+	Image     string             `json:"image,omitempty" bson:"image,omitempty"`
+	Summary   string             `json:"summary,omitempty" bson:"summary,omitempty"`
 	Post_type string             `json:"post_type,omitempty" bson:"post_type,omitempty"`
 	Content   Content            `json:"content,omitempty" bson:"content,omitempty"`
 	Date      string             `json:"date,omitempty" bson:"date,omitempty"`
