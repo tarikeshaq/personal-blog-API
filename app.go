@@ -30,17 +30,17 @@ var database *mongo.Database
 
 type Post = models.Post
 
-func setupContext() context.Context {
+func setupContext() (context.Context, context.CancelFunc) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
 	ctx = context.WithValue(ctx, hostKey, os.Getenv("MONGO_HOST"))
 	ctx = context.WithValue(ctx, usernameKey, os.Getenv("MONGO_USERNAME"))
 	ctx = context.WithValue(ctx, passwordKey, os.Getenv("MONGO_PASSWORD"))
 	ctx = context.WithValue(ctx, databaseKey, os.Getenv("MONGO_DATABASE"))
-	return ctx
+	return ctx, cancel
 }
 
-func setupDB(ctx context.Context) *mongo.Database {
+func setupDB(ctx context.Context, cancel context.CancelFunc) *mongo.Database {
+	defer cancel()
 	uri := fmt.Sprintf(`mongodb://%s:%s@%s/%s`,
 		ctx.Value(usernameKey).(string),
 		ctx.Value(passwordKey).(string),
@@ -156,8 +156,8 @@ func RemoveBlogHandler(response http.ResponseWriter, request *http.Request) {
 }
 
 func main() {
-	ctx := setupContext()
-	database = setupDB(ctx)
+	ctx, cancel := setupContext()
+	database = setupDB(ctx, cancel)
 	router := setupRoutes()
 
 	http.ListenAndServe(":"+os.Getenv("PORT"), router)
