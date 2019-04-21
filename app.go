@@ -71,6 +71,10 @@ func setupRoutes() *mux.Router {
 
 func GetAllBlogsHandler(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("content-type", "application/json")
+	response.Header().Set("Access-Control-Allow-Origin", "*")
+	response.Header().Set("Access-Control-Allow-Methods", "GET")
+	response.Header().Set("Access-Control-Allow-Headers",
+		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 	var posts []Post
 	collection := database.Collection("posts")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -100,7 +104,11 @@ func GetAllBlogsHandler(response http.ResponseWriter, request *http.Request) {
 
 func GetOneBlogHandler(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("content-type", "application/json")
-
+	response.Header().Set("content-type", "application/json")
+	response.Header().Set("Access-Control-Allow-Origin", "*")
+	response.Header().Set("Access-Control-Allow-Methods", "GET")
+	response.Header().Set("Access-Control-Allow-Headers",
+		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 	params := mux.Vars(request)
 	blogId, _ := primitive.ObjectIDFromHex(params["blogId"])
 	var post Post
