@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -21,6 +23,11 @@ const (
 	passwordKey = key("passwordKey")
 	databaseKey = key("databaseKey")
 )
+
+func hasher(s string) []byte {
+	val := sha256.Sum256([]byte(s))
+	return val[:]
+}
 
 var client *mongo.Client
 var database *mongo.Database
@@ -47,26 +54,28 @@ func setupDB(ctx context.Context, cancel context.CancelFunc) *mongo.Database {
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 	if err != nil {
-		fmt.Errorf(err.Error())
+		log.Fatalf(err.Error())
 	}
 	err = client.Connect(ctx)
 	if err != nil {
-		fmt.Errorf(err.Error())
+		log.Fatalf(err.Error())
 	}
 
 	return client.Database("blogs")
 }
 
 func setupRoutes() *mux.Router {
+	password := hasher(os.Getenv("PASSWORD"))
+	username := hasher(os.Getenv("USERNAME"))
 	router := mux.NewRouter()
 	router.HandleFunc("/blogs", GetAllBlogsHandler).Methods("GET")
 	router.HandleFunc("/blogs/{blogId}", GetOneBlogHandler).Methods("GET")
 	router.HandleFunc("/blogs", BasicAuth(AddNewBlogHandler,
-		os.Getenv("USERNAME"), os.Getenv("PASSWORD"),
+		username, password,
 		"Please input your username and password")).Methods("POST")
 
 	router.HandleFunc("/blogs/{blogId}", BasicAuth(RemoveBlogHandler,
-		os.Getenv("USERNAME"), os.Getenv("PASSWORD"),
+		username, password,
 		"Please input your username and password")).Methods("DELETE")
 	return router
 }

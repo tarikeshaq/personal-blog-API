@@ -106,11 +106,12 @@ func writeHeaders(response http.ResponseWriter) {
 		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 }
 
-func BasicAuth(handler http.HandlerFunc, username, password, realm string) http.HandlerFunc {
+func BasicAuth(handler http.HandlerFunc, userHash, passHash []byte, realm string) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		user, pass, ok := request.BasicAuth()
 
-		if !ok || subtle.ConstantTimeCompare([]byte(user), []byte(username)) != 1 || subtle.ConstantTimeCompare([]byte(pass), []byte(password)) != 1 {
+		if !ok || subtle.ConstantTimeCompare(hasher(user), userHash) != 1 ||
+			subtle.ConstantTimeCompare(hasher(pass), passHash) != 1 {
 			writer.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
 			writer.WriteHeader(401)
 			writer.Write([]byte("Unauthorised.\n"))
