@@ -11,30 +11,29 @@ for a MUX-MongoDB project.
 ### Prerequisites
 
 Of course, you'll need to have golang installed https://golang.org/dl/ (I use version 1.12.1, if you're using a different version
-please change the "go-version" in the Gopkg.toml" . Additionally, for dependency management,
-this project uses dep https://github.com/golang/dep
+please change the "go-version" in the go.mod file. Additionally, for dependency management,
+this project uses go modules!
 
 ```
-$ go get github.com/tarikeshaq/personal-blog-API
+$ git clone https://github.com/tarikeshaq/personal-blog-API.git
 ```
 
-If you're unfamiliar with Go, this will download the repository in the GOPATH/src
-Find where your GOPATH variable points, then navigate to src/github.com/tarikeshaq/personal-blog-API
+Since this project used go modules, you don't need to place it in your GOPATH :smile: Simply clone the project and run it!
 
-NOTE: If you plan to deploy your application, you may want to fork my repository first, then clone that to avoid complication with 
- the user name :no_mouth:
+
+NOTE: You'd need Go 1.11+ in order to run this using go modules
 
 
 ### Installing
 
-With dep installed, you'll be able to run in no time!
-navigate to the cloned repo, and pull the dependencies using dep ensure
+With the repo downloaded, you'll be able to run in no time!
+navigate to the cloned repo, and pull the dependencies by running go build
 
 ```
-$ dep ensure
+$ go build
 ```
 
-This will make sure all the dependencies are correct (I have my vendors as a part of the repository, so dep ensure is more of a precausion)
+This will create the binary and make sure all the dependencies are correct (Will download any dependencies you don't have, yay go modules)
 
 Now, you'll have the project ready, but you do need to set some Environment (OS) variables
 
@@ -50,7 +49,7 @@ Now, you'll have the project ready, but you do need to set some Environment (OS)
 With that the application should be ready for you take on a ride!!
 Make sure that your MongoDB server is running, then run the following:
 ```
-$ go run app.go
+$ go run main.go
 ```
 
 With that the server should be running and ready to be queried
@@ -67,15 +66,13 @@ To check the structure of a blog post, check the /models directory
 
 ## Deployment
 
-I have my application deployed on Heroku, (it plays nice with dep, which I found difficulties with gcloud :sweat_smile: )
+I have my application deployed on Heroku
 
-You can deploy on heroku by adding your repository from the heroku site, or using the CLI, just make sure all the 
-dependencies and the Gopkg.toml are correct.
+You can deploy on heroku by adding your repository from the heroku site, or using the CLI
 
 ## Built With
 
 * [Mux](https://github.com/gorilla/mux) - Routing management
-* [Dep](https://github.com/golang/dep) - Dependency Management
 * [Mongo-go-driver](https://github.com/mongodb/mongo-go-driver) - For interacting with the database
 
 ## Contributing
