@@ -13,7 +13,7 @@ import (
 )
 
 func GetAllBlogsHandler(response http.ResponseWriter, request *http.Request) {
-	writerHeaders(response)
+	writeHeaders(response)
 	var posts []Post
 	collection := database.Collection("posts")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -42,7 +42,7 @@ func GetAllBlogsHandler(response http.ResponseWriter, request *http.Request) {
 }
 
 func GetOneBlogHandler(response http.ResponseWriter, request *http.Request) {
-	writerHeaders(response)
+	writeHeaders(response)
 
 	params := mux.Vars(request)
 	blogId, _ := primitive.ObjectIDFromHex(params["blogId"])
@@ -62,7 +62,7 @@ func GetOneBlogHandler(response http.ResponseWriter, request *http.Request) {
 }
 
 func AddNewBlogHandler(response http.ResponseWriter, request *http.Request) {
-	writerHeaders(response)
+	writeHeaders(response)
 
 	var post Post
 	_ = json.NewDecoder(request.Body).Decode(&post)
@@ -80,7 +80,7 @@ func AddNewBlogHandler(response http.ResponseWriter, request *http.Request) {
 }
 
 func RemoveBlogHandler(response http.ResponseWriter, request *http.Request) {
-	writerHeaders(response)
+	writeHeaders(response)
 
 	vars := mux.Vars(request)
 	blogID, _ := primitive.ObjectIDFromHex(vars["blogId"])
@@ -98,7 +98,7 @@ func RemoveBlogHandler(response http.ResponseWriter, request *http.Request) {
 	json.NewEncoder(response).Encode(result)
 }
 
-func writerHeaders(response http.ResponseWriter) {
+func writeHeaders(response http.ResponseWriter) {
 	response.Header().Set("Content-Type", "application/json")
 	response.Header().Set("Access-Control-Allow-Origin", "*")
 	response.Header().Set("Access-Control-Allow-Methods", "GET")
