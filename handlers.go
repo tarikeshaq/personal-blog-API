@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/subtle"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -103,4 +104,19 @@ func writerHeaders(response http.ResponseWriter) {
 	response.Header().Set("Access-Control-Allow-Methods", "GET")
 	response.Header().Set("Access-Control-Allow-Headers",
 		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+}
+
+func BasicAuth(handler http.HandlerFunc, username, password, realm string) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		user, pass, ok := request.BasicAuth()
+
+		if !ok || subtle.ConstantTimeCompare([]byte(user), []byte(username)) != 1 || subtle.ConstantTimeCompare([]byte(pass), []byte(password)) != 1 {
+			writer.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
+			writer.WriteHeader(401)
+			writer.Write([]byte("Unauthorised.\n"))
+			return
+		}
+
+		handler(writer, request)
+	}
 }

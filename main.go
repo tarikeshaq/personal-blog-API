@@ -61,8 +61,13 @@ func setupRoutes() *mux.Router {
 	router := mux.NewRouter()
 	router.HandleFunc("/blogs", GetAllBlogsHandler).Methods("GET")
 	router.HandleFunc("/blogs/{blogId}", GetOneBlogHandler).Methods("GET")
-	router.HandleFunc("/blogs", AddNewBlogHandler).Methods("POST")
-	router.HandleFunc("/blogs/{blogId}", RemoveBlogHandler).Methods("DELETE")
+	router.HandleFunc("/blogs", BasicAuth(AddNewBlogHandler,
+		os.Getenv("USERNAME"), os.Getenv("PASSWORD"),
+		"Please input your username and password")).Methods("POST")
+
+	router.HandleFunc("/blogs/{blogId}", BasicAuth(RemoveBlogHandler,
+		os.Getenv("USERNAME"), os.Getenv("PASSWORD"),
+		"Please input your username and password")).Methods("DELETE")
 	return router
 }
 
