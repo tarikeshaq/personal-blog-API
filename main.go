@@ -77,6 +77,9 @@ func setupRoutes() *mux.Router {
 	router.HandleFunc("/blogs/{blogId}", BasicAuth(RemoveBlogHandler,
 		username, password,
 		"Please input your username and password")).Methods("DELETE")
+	router.HandleFunc("/blogs", BasicAuth(RemoveAllBlogsHandler,
+		username, password,
+		"Please input your username and password")).Methods("DELETE")
 	return router
 }
 
