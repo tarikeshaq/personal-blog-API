@@ -98,6 +98,24 @@ func RemoveBlogHandler(response http.ResponseWriter, request *http.Request) {
 	json.NewEncoder(response).Encode(result)
 }
 
+func RemoveAllBlogsHandler(response http.ResponseWriter, request *http.Request) {
+	writeHeaders(response)
+
+	collection := database.Collection("posts")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	filter := bson.D{}
+
+	result, err := collection.DeleteMany(ctx, filter)
+	if err != nil {
+		response.WriteHeader(http.StatusInternalServerError)
+		response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
+		return
+	}
+	json.NewEncoder(response).Encode(result)
+}
+
 func writeHeaders(response http.ResponseWriter) {
 	response.Header().Set("Content-Type", "application/json")
 	response.Header().Set("Access-Control-Allow-Origin", "*")
